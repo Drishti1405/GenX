@@ -51,10 +51,11 @@ for (const p of possibleFrontendPaths) {
 
 // MongoDB Connection with Serverless Support
 let isMongoConnected = false;
-let mongoPromise = null;
+
+mongoose.set('bufferCommands', false);
 
 async function connectDB() {
-  if (mongoose.connection.readyState >= 1) {
+  if (mongoose.connection.readyState === 1) {
     isMongoConnected = true;
     return true;
   }
@@ -62,29 +63,26 @@ async function connectDB() {
     isMongoConnected = false;
     return false;
   }
-  if (!mongoPromise) {
-    mongoPromise = mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 5000
-    }).then(() => {
-      isMongoConnected = true;
-      console.log(`[MongoDB] Connected to database`);
-      return true;
-    }).catch(err => {
-      console.warn(`[MongoDB] Connection error: ${err.message}. Using memory fallback.`);
-      isMongoConnected = false;
-      mongoPromise = null;
-      return false;
+  try {
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 3000
     });
+    isMongoConnected = (mongoose.connection.readyState === 1);
+    if (isMongoConnected) console.log(`[MongoDB] Connected to database`);
+    return isMongoConnected;
+  } catch (err) {
+    console.warn(`[MongoDB] Connection error: ${err.message}. Using memory fallback.`);
+    isMongoConnected = false;
+    return false;
   }
-  return mongoPromise;
 }
 
 // Initial trigger
-connectDB();
+connectDB().catch(() => {});
 
-// Middleware to ensure DB connection is ready for API calls
+// Middleware to ensure DB connection is checked for API calls
 app.use(async (req, res, next) => {
-  if (!isMongoConnected) {
+  if (mongoose.connection.readyState !== 1) {
     try { await connectDB(); } catch {}
   }
   next();
@@ -112,16 +110,20 @@ app.post('/api/auth/register', async (req, res) => {
     if (!username || !email || !password)
       return res.status(400).json({ error: 'Username, email and password are required.' });
 
-    if (isMongoConnected) {
-      if (await User.findOne({ email: email.toLowerCase() }))
-        return res.status(400).json({ error: 'Email already registered.' });
-      if (await User.findOne({ username }))
-        return res.status(400).json({ error: 'Username already taken.' });
+    if (isMongoConnected && mongoose.connection.readyState === 1) {
+      try {
+        if (await User.findOne({ email: email.toLowerCase() }))
+          return res.status(400).json({ error: 'Email already registered.' });
+        if (await User.findOne({ username }))
+          return res.status(400).json({ error: 'Username already taken.' });
 
-      const hashed = await bcrypt.hash(password, 10);
-      const newUser = await User.create({ username, email: email.toLowerCase(), password: hashed, avatar: avatar || '🚀' });
-      const token = jwt.sign({ id: newUser._id, username: newUser.username, email: newUser.email, avatar: newUser.avatar }, JWT_SECRET, { expiresIn: '7d' });
-      return res.status(201).json({ token, user: { id: newUser._id, username: newUser.username, email: newUser.email, avatar: newUser.avatar, status: newUser.status || 'online' } });
+        const hashed = await bcrypt.hash(password, 10);
+        const newUser = await User.create({ username, email: email.toLowerCase(), password: hashed, avatar: avatar || '🚀' });
+        const token = jwt.sign({ id: newUser._id, username: newUser.username, email: newUser.email, avatar: newUser.avatar }, JWT_SECRET, { expiresIn: '7d' });
+        return res.status(201).json({ token, user: { id: newUser._id, username: newUser.username, email: newUser.email, avatar: newUser.avatar, status: newUser.status || 'online' } });
+      } catch (e) {
+        console.warn('Mongo register fallback:', e.message);
+      }
     }
 
     // In-memory registration fallback
@@ -143,13 +145,18 @@ app.post('/api/auth/login', async (req, res) => {
     const { emailOrUsername, password } = req.body;
     if (!emailOrUsername || !password) return res.status(400).json({ error: 'Credentials required.' });
 
-    if (isMongoConnected) {
-      const user = await User.findOne({ $or: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername }] });
-      if (!user) return res.status(400).json({ error: 'User not found.' });
-      if (!await bcrypt.compare(password, user.password)) return res.status(400).json({ error: 'Wrong password.' });
+    if (isMongoConnected && mongoose.connection.readyState === 1) {
+      try {
+        const user = await User.findOne({ $or: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername }] });
+        if (user) {
+          if (!await bcrypt.compare(password, user.password)) return res.status(400).json({ error: 'Wrong password.' });
 
-      const token = jwt.sign({ id: user._id, username: user.username, email: user.email, avatar: user.avatar }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ token, user: { id: user._id, username: user.username, email: user.email, avatar: user.avatar, status: user.status || 'online' } });
+          const token = jwt.sign({ id: user._id, username: user.username, email: user.email, avatar: user.avatar }, JWT_SECRET, { expiresIn: '7d' });
+          return res.json({ token, user: { id: user._id, username: user.username, email: user.email, avatar: user.avatar, status: user.status || 'online' } });
+        }
+      } catch (e) {
+        console.warn('Mongo login fallback:', e.message);
+      }
     }
 
     // In-memory login fallback
