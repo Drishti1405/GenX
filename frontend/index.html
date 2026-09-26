@@ -1,392 +1,413 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ChitChat — Modern Realtime Workspace</title>
-  <meta name="description" content="ChitChat: real-time community chat with channels, reactions, polls, mentions and more."/>
+  <meta name="description"
+    content="ChitChat: real-time community chat with channels, reactions, polls, mentions and more." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
-<!-- ═══════════════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════════════
      AUTH MODAL
 ═══════════════════════════════════════════════════ -->
-<div id="login-modal" class="modal-overlay">
-  <div class="modal-card glassmorphism">
-    <div class="modal-header">
-      <img src="logo.jpg" alt="ChitChat Logo" class="brand-logo-large"/>
-      <h2>Welcome to <span>ChitChat</span></h2>
-      <p>Real-time community chat with channels, polls, reactions &amp; more.</p>
-    </div>
-    <div class="auth-tabs">
-      <button id="tab-login-btn" class="auth-tab-btn active">Log In</button>
-      <button id="tab-register-btn" class="auth-tab-btn">Create Account</button>
-    </div>
-    <div id="auth-error-box" class="auth-error-box hidden"></div>
+  <div id="login-modal" class="modal-overlay">
+    <div class="modal-card glassmorphism">
+      <div class="modal-header">
+        <img src="logo.jpg" alt="ChitChat Logo" class="brand-logo-large" />
+        <h2>Welcome to <span>ChitChat</span></h2>
+        <p>Real-time community chat with channels, polls, reactions &amp; more.</p>
+      </div>
+      <div class="auth-tabs">
+        <button id="tab-login-btn" class="auth-tab-btn active">Log In</button>
+        <button id="tab-register-btn" class="auth-tab-btn">Create Account</button>
+      </div>
+      <div id="auth-error-box" class="auth-error-box hidden"></div>
 
-    <!-- LOGIN -->
-    <form id="login-form" class="auth-form">
-      <div class="input-group">
-        <label for="login-identifier">Username or Email</label>
-        <input type="text" id="login-identifier" placeholder="e.g. alex or alex@example.com" required autocomplete="username" autofocus/>
-      </div>
-      <div class="input-group">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password"/>
-      </div>
-      <button type="submit" class="btn-primary-gradient full-width" id="login-submit-btn">Log In to Workspace</button>
-    </form>
-
-    <!-- REGISTER -->
-    <form id="register-form" class="auth-form hidden">
-      <div class="avatar-picker-section">
-        <label>Choose Avatar</label>
-        <div class="avatar-grid" id="avatar-grid">
-          <button type="button" class="avatar-opt active" data-avatar="🚀">🚀</button>
-          <button type="button" class="avatar-opt" data-avatar="🦊">🦊</button>
-          <button type="button" class="avatar-opt" data-avatar="⚡">⚡</button>
-          <button type="button" class="avatar-opt" data-avatar="👑">👑</button>
-          <button type="button" class="avatar-opt" data-avatar="💎">💎</button>
-          <button type="button" class="avatar-opt" data-avatar="🎨">🎨</button>
-          <button type="button" class="avatar-opt" data-avatar="🎧">🎧</button>
-          <button type="button" class="avatar-opt" data-avatar="🎮">🎮</button>
-          <button type="button" class="avatar-opt" data-avatar="🦄">🦄</button>
-          <button type="button" class="avatar-opt" data-avatar="🌟">🌟</button>
-          <button type="button" class="avatar-opt" data-avatar="🍕">🍕</button>
-          <button type="button" class="avatar-opt" data-avatar="🔥">🔥</button>
-        </div>
-      </div>
-      <div class="input-group">
-        <label for="reg-username">Display Username</label>
-        <input type="text" id="reg-username" placeholder="e.g. AlexRivera" required minlength="3" maxlength="25" autocomplete="off"/>
-      </div>
-      <div class="input-group">
-        <label for="reg-email">Email Address</label>
-        <input type="email" id="reg-email" placeholder="e.g. alex@example.com" required autocomplete="email"/>
-      </div>
-      <div class="input-group">
-        <label for="reg-password">Password</label>
-        <input type="password" id="reg-password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password"/>
-      </div>
-      <button type="submit" class="btn-primary-gradient full-width" id="register-submit-btn">Create Account</button>
-    </form>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     PROFILE EDIT MODAL
-═══════════════════════════════════════════════════ -->
-<div id="profile-modal" class="modal-overlay hidden">
-  <div class="modal-card glassmorphism" style="max-width:400px">
-    <div class="modal-close-row">
-      <h3>Edit Profile</h3>
-      <button id="profile-modal-close" class="icon-btn-sm">✕</button>
-    </div>
-    <div id="profile-error-box" class="auth-error-box hidden"></div>
-    <div id="profile-success-box" class="auth-success-box hidden"></div>
-    <form id="profile-form">
-      <div class="avatar-picker-section">
-        <label>Avatar</label>
-        <div class="avatar-grid" id="profile-avatar-grid">
-          <button type="button" class="avatar-opt" data-avatar="🚀">🚀</button>
-          <button type="button" class="avatar-opt" data-avatar="🦊">🦊</button>
-          <button type="button" class="avatar-opt" data-avatar="⚡">⚡</button>
-          <button type="button" class="avatar-opt" data-avatar="👑">👑</button>
-          <button type="button" class="avatar-opt" data-avatar="💎">💎</button>
-          <button type="button" class="avatar-opt" data-avatar="🎨">🎨</button>
-          <button type="button" class="avatar-opt" data-avatar="🎧">🎧</button>
-          <button type="button" class="avatar-opt" data-avatar="🎮">🎮</button>
-          <button type="button" class="avatar-opt" data-avatar="🦄">🦄</button>
-          <button type="button" class="avatar-opt" data-avatar="🌟">🌟</button>
-          <button type="button" class="avatar-opt" data-avatar="🍕">🍕</button>
-          <button type="button" class="avatar-opt" data-avatar="🔥">🔥</button>
-        </div>
-      </div>
-      <div class="input-group">
-        <label for="profile-status">Status</label>
-        <select id="profile-status" class="styled-select">
-          <option value="online">🟢 Online</option>
-          <option value="away">🌙 Away</option>
-          <option value="dnd">⛔ Do Not Disturb</option>
-        </select>
-      </div>
-      <hr class="divider"/>
-      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:8px">Change Password (optional)</p>
-      <div class="input-group">
-        <label for="profile-current-pass">Current Password</label>
-        <input type="password" id="profile-current-pass" placeholder="Your current password"/>
-      </div>
-      <div class="input-group">
-        <label for="profile-new-pass">New Password</label>
-        <input type="password" id="profile-new-pass" placeholder="New password (min 6 chars)" minlength="6"/>
-      </div>
-      <button type="submit" class="btn-primary-gradient full-width">Save Changes</button>
-    </form>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     CREATE CHANNEL MODAL
-═══════════════════════════════════════════════════ -->
-<div id="create-channel-modal" class="modal-overlay hidden">
-  <div class="modal-card glassmorphism" style="max-width:380px">
-    <div class="modal-close-row">
-      <h3>Create Channel</h3>
-      <button id="create-channel-close" class="icon-btn-sm">✕</button>
-    </div>
-    <form id="create-channel-form">
-      <div class="input-group">
-        <label for="new-channel-name">Channel Name</label>
-        <input type="text" id="new-channel-name" placeholder="e.g. design-feedback" required maxlength="30"/>
-      </div>
-      <div class="input-group">
-        <label for="new-channel-desc">Description (optional)</label>
-        <input type="text" id="new-channel-desc" placeholder="What's this channel about?" maxlength="100"/>
-      </div>
-      <div id="create-channel-error" class="auth-error-box hidden"></div>
-      <button type="submit" class="btn-primary-gradient full-width">Create Channel</button>
-    </form>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     POLL CREATE MODAL
-═══════════════════════════════════════════════════ -->
-<div id="poll-modal" class="modal-overlay hidden">
-  <div class="modal-card glassmorphism" style="max-width:400px">
-    <div class="modal-close-row">
-      <h3>Create Poll</h3>
-      <button id="poll-modal-close" class="icon-btn-sm">✕</button>
-    </div>
-    <form id="poll-form">
-      <div class="input-group">
-        <label for="poll-question">Question</label>
-        <input type="text" id="poll-question" placeholder="Ask the community..." required maxlength="120"/>
-      </div>
-      <div id="poll-options-container">
+      <!-- LOGIN -->
+      <form id="login-form" class="auth-form">
         <div class="input-group">
-          <label>Options</label>
-          <input type="text" class="poll-option-input" placeholder="Option 1" required/>
-          <input type="text" class="poll-option-input" placeholder="Option 2" required style="margin-top:8px"/>
+          <label for="login-identifier">Username or Email</label>
+          <input type="text" id="login-identifier" placeholder="e.g. alex or alex@example.com" required
+            autocomplete="username" autofocus />
         </div>
-      </div>
-      <button type="button" id="add-poll-option-btn" class="btn-outline" style="margin-bottom:16px">+ Add Option</button>
-      <button type="submit" class="btn-primary-gradient full-width">Launch Poll 🗳️</button>
-    </form>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     PINNED MESSAGES PANEL
-═══════════════════════════════════════════════════ -->
-<div id="pinned-panel" class="side-panel glassmorphism hidden">
-  <div class="side-panel-header">
-    <span>📌 Pinned Messages</span>
-    <button id="pinned-panel-close" class="icon-btn-sm">✕</button>
-  </div>
-  <div id="pinned-list" class="pinned-list"></div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     IMAGE GALLERY PANEL
-═══════════════════════════════════════════════════ -->
-<div id="gallery-panel" class="side-panel glassmorphism hidden">
-  <div class="side-panel-header">
-    <span>🖼️ Media Gallery</span>
-    <button id="gallery-panel-close" class="icon-btn-sm">✕</button>
-  </div>
-  <div id="gallery-grid" class="gallery-grid"></div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     MENTION TOAST
-═══════════════════════════════════════════════════ -->
-<div id="mention-toast" class="mention-toast hidden">
-  <span id="mention-toast-text"></span>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     MAIN APP
-═══════════════════════════════════════════════════ -->
-<div id="app-container" class="app-layout hidden">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar glassmorphism" id="sidebar">
-    <div class="sidebar-header">
-      <div class="brand">
-        <img src="logo.jpg" alt="Logo" class="brand-logo"/>
-        <span class="brand-name">ChitChat</span>
-      </div>
-      <button id="sidebar-close-btn" class="icon-btn mobile-only" title="Close">✕</button>
-    </div>
-
-    <!-- CHANNELS -->
-    <div class="sidebar-section">
-      <div class="section-title">
-        <span>Channels</span>
-        <button id="open-create-channel-btn" class="icon-btn-xs" title="Create Channel">＋</button>
-      </div>
-      <nav class="channel-list" id="channel-list">
-        <button class="channel-btn active" data-room="general"><span class="channel-hash">#</span><span class="channel-name">general</span><span class="unread-badge hidden" data-room="general">0</span></button>
-        <button class="channel-btn" data-room="lounge"><span class="channel-hash">#</span><span class="channel-name">lounge</span><span class="unread-badge hidden" data-room="lounge">0</span></button>
-        <button class="channel-btn" data-room="tech-talk"><span class="channel-hash">#</span><span class="channel-name">tech-talk</span><span class="unread-badge hidden" data-room="tech-talk">0</span></button>
-        <button class="channel-btn" data-room="random"><span class="channel-hash">#</span><span class="channel-name">random</span><span class="unread-badge hidden" data-room="random">0</span></button>
-        <button class="channel-btn" data-room="music-lounge"><span class="channel-hash">#</span><span class="channel-name">music-lounge</span><span class="unread-badge hidden" data-room="music-lounge">0</span></button>
-      </nav>
-    </div>
-
-    <!-- ONLINE MEMBERS -->
-    <div class="sidebar-section users-section">
-      <div class="section-title">
-        <span>Online Members</span>
-        <span class="online-badge" id="online-count">0</span>
-      </div>
-      <div class="users-list" id="users-list"></div>
-    </div>
-
-    <!-- USER PROFILE BAR -->
-    <div class="user-profile-bar">
-      <div class="profile-avatar" id="current-user-avatar">🚀</div>
-      <div class="profile-info">
-        <div class="profile-name" id="current-user-name">User</div>
-        <div class="profile-email" id="current-user-email">user@example.com</div>
-      </div>
-      <button id="edit-profile-btn" class="icon-btn-profile" title="Edit Profile">✏️</button>
-      <button id="logout-btn" class="logout-btn" title="Log Out">🚪</button>
-    </div>
-  </aside>
-
-  <!-- MAIN CHAT -->
-  <main class="chat-main">
-
-    <!-- HEADER -->
-    <header class="main-header glassmorphism">
-      <div class="header-left">
-        <button id="mobile-menu-btn" class="icon-btn mobile-only">☰</button>
-        <div class="room-details">
-          <h1 id="current-room-title"><span class="hash">#</span>general</h1>
-          <p id="current-room-desc" class="room-desc">Main community chat &amp; announcements</p>
+        <div class="input-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
         </div>
-      </div>
-      <div class="header-controls">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="Search messages..."/>
-        </div>
-        <button id="pinned-btn" class="icon-btn" title="Pinned Messages">📌</button>
-        <button id="gallery-btn" class="icon-btn" title="Media Gallery">🖼️</button>
-        <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound"><span id="sound-icon">🔊</span></button>
-        <button id="notif-btn" class="icon-btn" title="Enable Notifications"><span id="notif-icon">🔔</span></button>
-        <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme"><span id="theme-icon">🌙</span></button>
-      </div>
-    </header>
-
-    <!-- MESSAGES -->
-    <div class="messages-container" id="messages-container">
-      <div class="channel-welcome-banner glassmorphism" id="welcome-banner">
-        <div class="welcome-icon">💬</div>
-        <h2>Welcome to <span id="banner-room-name">#general</span>!</h2>
-        <p>Start of <span id="banner-room-sub">#general</span> history. Say hello 👋</p>
-      </div>
-      <div id="messages-list" class="messages-list"></div>
-    </div>
-
-    <!-- TYPING INDICATOR -->
-    <div id="typing-indicator" class="typing-indicator hidden">
-      <span class="dots"><span>.</span><span>.</span><span>.</span></span>
-      <span id="typing-text">Someone is typing</span>
-    </div>
-
-    <!-- INPUT AREA -->
-    <footer class="input-area glassmorphism">
-
-      <!-- REPLY BANNER -->
-      <div id="reply-banner" class="reply-banner hidden">
-        <div class="reply-info">
-          <span class="reply-label">↩️ Replying to <strong id="reply-username">User</strong></span>
-          <span class="reply-snippet" id="reply-snippet"></span>
-        </div>
-        <button id="cancel-reply-btn" class="icon-btn-sm">✕</button>
-      </div>
-
-      <!-- EDIT BANNER -->
-      <div id="edit-banner" class="reply-banner hidden" style="border-left-color:#f59e0b">
-        <div class="reply-info">
-          <span class="reply-label" style="color:#f59e0b">✏️ Editing message</span>
-          <span class="reply-snippet" id="edit-snippet"></span>
-        </div>
-        <button id="cancel-edit-btn" class="icon-btn-sm">✕</button>
-      </div>
-
-      <!-- IMAGE PREVIEW -->
-      <div id="image-preview-bar" class="image-preview-bar hidden">
-        <img id="image-preview-thumb" src="" alt=""/>
-        <button id="remove-image-btn" class="icon-btn-sm">✕</button>
-      </div>
-
-      <!-- EMOJI PICKER -->
-      <div id="emoji-picker" class="emoji-picker glassmorphism hidden">
-        <div class="emoji-picker-tabs">
-          <button class="epick-tab active" data-tab="quick">Quick</button>
-          <button class="epick-tab" data-tab="all">All</button>
-        </div>
-        <div class="emoji-grid" id="emoji-quick-grid">
-          <span>😀</span><span>😂</span><span>😍</span><span>🔥</span><span>🚀</span>
-          <span>❤️</span><span>👍</span><span>🎉</span><span>😎</span><span>🙌</span>
-          <span>💡</span><span>✨</span><span>🥳</span><span>💯</span><span>👏</span>
-          <span>🙏</span><span>💩</span><span>🤩</span><span>💪</span><span>🎯</span>
-          <span>🌈</span><span>⭐</span><span>🎵</span><span>🤔</span><span>😅</span>
-          <span>😭</span><span>🥰</span><span>🤝</span><span>🎊</span><span>🦾</span>
-        </div>
-      </div>
-
-      <!-- GIF PICKER -->
-      <div id="gif-picker" class="gif-picker glassmorphism hidden">
-        <div class="gif-search-row">
-          <input type="text" id="gif-search-input" placeholder="Search GIFs..." />
-          <button type="button" id="gif-search-btn" class="btn-primary-gradient" style="padding:6px 12px;font-size:.8rem">Search</button>
-        </div>
-        <div id="gif-grid" class="gif-grid">
-          <p style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:20px">Type to search GIFs 🎬</p>
-        </div>
-      </div>
-
-      <form id="chat-form" class="chat-form">
-        <label class="icon-btn attachment-btn" title="Attach Image">
-          <span>📷</span>
-          <input type="file" id="image-input" accept="image/*" class="hidden-input"/>
-        </label>
-        <button type="button" id="gif-btn" class="icon-btn" title="GIFs">🎬</button>
-        <button type="button" id="emoji-btn" class="icon-btn" title="Emoji">😀</button>
-        <button type="button" id="poll-btn" class="icon-btn" title="Create Poll">🗳️</button>
-        <input type="text" id="chat-input" placeholder="Message #general... (use @username to mention)" autocomplete="off"/>
-        <button type="submit" class="btn-send-gradient" id="send-btn">
-          <span>Send</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
+        <button type="submit" class="btn-primary-gradient full-width" id="login-submit-btn">Log In to Workspace</button>
       </form>
 
-      <!-- MENTION AUTOCOMPLETE -->
-      <div id="mention-autocomplete" class="mention-autocomplete hidden"></div>
+      <!-- REGISTER -->
+      <form id="register-form" class="auth-form hidden">
+        <div class="avatar-picker-section">
+          <label>Choose Avatar</label>
+          <div class="avatar-grid" id="avatar-grid">
+            <button type="button" class="avatar-opt active" data-avatar="🚀">🚀</button>
+            <button type="button" class="avatar-opt" data-avatar="🦊">🦊</button>
+            <button type="button" class="avatar-opt" data-avatar="⚡">⚡</button>
+            <button type="button" class="avatar-opt" data-avatar="👑">👑</button>
+            <button type="button" class="avatar-opt" data-avatar="💎">💎</button>
+            <button type="button" class="avatar-opt" data-avatar="🎨">🎨</button>
+            <button type="button" class="avatar-opt" data-avatar="🎧">🎧</button>
+            <button type="button" class="avatar-opt" data-avatar="🎮">🎮</button>
+            <button type="button" class="avatar-opt" data-avatar="🦄">🦄</button>
+            <button type="button" class="avatar-opt" data-avatar="🌟">🌟</button>
+            <button type="button" class="avatar-opt" data-avatar="🍕">🍕</button>
+            <button type="button" class="avatar-opt" data-avatar="🔥">🔥</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="reg-username">Display Username</label>
+          <input type="text" id="reg-username" placeholder="e.g. AlexRivera" required minlength="3" maxlength="25"
+            autocomplete="off" />
+        </div>
+        <div class="input-group">
+          <label for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" placeholder="e.g. alex@example.com" required autocomplete="email" />
+        </div>
+        <div class="input-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" placeholder="At least 6 characters" required minlength="6"
+            autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn-primary-gradient full-width" id="register-submit-btn">Create Account</button>
+      </form>
+    </div>
+  </div>
 
-    </footer>
-  </main>
-</div>
+  <!-- ═══════════════════════════════════════════════════
+     PROFILE EDIT MODAL
+═══════════════════════════════════════════════════ -->
+  <div id="profile-modal" class="modal-overlay hidden">
+    <div class="modal-card glassmorphism" style="max-width:400px">
+      <div class="modal-close-row">
+        <h3>Edit Profile</h3>
+        <button id="profile-modal-close" class="icon-btn-sm">✕</button>
+      </div>
+      <div id="profile-error-box" class="auth-error-box hidden"></div>
+      <div id="profile-success-box" class="auth-success-box hidden"></div>
+      <form id="profile-form">
+        <div class="avatar-picker-section">
+          <label>Avatar</label>
+          <div class="avatar-grid" id="profile-avatar-grid">
+            <button type="button" class="avatar-opt" data-avatar="🚀">🚀</button>
+            <button type="button" class="avatar-opt" data-avatar="🦊">🦊</button>
+            <button type="button" class="avatar-opt" data-avatar="⚡">⚡</button>
+            <button type="button" class="avatar-opt" data-avatar="👑">👑</button>
+            <button type="button" class="avatar-opt" data-avatar="💎">💎</button>
+            <button type="button" class="avatar-opt" data-avatar="🎨">🎨</button>
+            <button type="button" class="avatar-opt" data-avatar="🎧">🎧</button>
+            <button type="button" class="avatar-opt" data-avatar="🎮">🎮</button>
+            <button type="button" class="avatar-opt" data-avatar="🦄">🦄</button>
+            <button type="button" class="avatar-opt" data-avatar="🌟">🌟</button>
+            <button type="button" class="avatar-opt" data-avatar="🍕">🍕</button>
+            <button type="button" class="avatar-opt" data-avatar="🔥">🔥</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="profile-status">Status</label>
+          <select id="profile-status" class="styled-select">
+            <option value="online">🟢 Online</option>
+            <option value="away">🌙 Away</option>
+            <option value="dnd">⛔ Do Not Disturb</option>
+          </select>
+        </div>
+        <hr class="divider" />
+        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:8px">Change Password (optional)</p>
+        <div class="input-group">
+          <label for="profile-current-pass">Current Password</label>
+          <input type="password" id="profile-current-pass" placeholder="Your current password" />
+        </div>
+        <div class="input-group">
+          <label for="profile-new-pass">New Password</label>
+          <input type="password" id="profile-new-pass" placeholder="New password (min 6 chars)" minlength="6" />
+        </div>
+        <button type="submit" class="btn-primary-gradient full-width">Save Changes</button>
+      </form>
+    </div>
+  </div>
 
-<!-- Socket.IO Client (Local server with CDN fallback for Netlify) -->
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  if (typeof io === 'undefined') {
-    document.write('<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"><\/script>');
-  }
-</script>
-<script src="app.js"></script>
+  <!-- ═══════════════════════════════════════════════════
+     CREATE CHANNEL MODAL
+═══════════════════════════════════════════════════ -->
+  <div id="create-channel-modal" class="modal-overlay hidden">
+    <div class="modal-card glassmorphism" style="max-width:380px">
+      <div class="modal-close-row">
+        <h3>Create Channel</h3>
+        <button id="create-channel-close" class="icon-btn-sm">✕</button>
+      </div>
+      <form id="create-channel-form">
+        <div class="input-group">
+          <label for="new-channel-name">Channel Name</label>
+          <input type="text" id="new-channel-name" placeholder="e.g. design-feedback" required maxlength="30" />
+        </div>
+        <div class="input-group">
+          <label for="new-channel-desc">Description (optional)</label>
+          <input type="text" id="new-channel-desc" placeholder="What's this channel about?" maxlength="100" />
+        </div>
+        <div id="create-channel-error" class="auth-error-box hidden"></div>
+        <button type="submit" class="btn-primary-gradient full-width">Create Channel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+     POLL CREATE MODAL
+═══════════════════════════════════════════════════ -->
+  <div id="poll-modal" class="modal-overlay hidden">
+    <div class="modal-card glassmorphism" style="max-width:400px">
+      <div class="modal-close-row">
+        <h3>Create Poll</h3>
+        <button id="poll-modal-close" class="icon-btn-sm">✕</button>
+      </div>
+      <form id="poll-form">
+        <div class="input-group">
+          <label for="poll-question">Question</label>
+          <input type="text" id="poll-question" placeholder="Ask the community..." required maxlength="120" />
+        </div>
+        <div id="poll-options-container">
+          <div class="input-group">
+            <label>Options</label>
+            <input type="text" class="poll-option-input" placeholder="Option 1" required />
+            <input type="text" class="poll-option-input" placeholder="Option 2" required style="margin-top:8px" />
+          </div>
+        </div>
+        <button type="button" id="add-poll-option-btn" class="btn-outline" style="margin-bottom:16px">+ Add
+          Option</button>
+        <button type="submit" class="btn-primary-gradient full-width">Launch Poll 🗳️</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+     PINNED MESSAGES PANEL
+═══════════════════════════════════════════════════ -->
+  <div id="pinned-panel" class="side-panel glassmorphism hidden">
+    <div class="side-panel-header">
+      <span>📌 Pinned Messages</span>
+      <button id="pinned-panel-close" class="icon-btn-sm">✕</button>
+    </div>
+    <div id="pinned-list" class="pinned-list"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+     IMAGE GALLERY PANEL
+═══════════════════════════════════════════════════ -->
+  <div id="gallery-panel" class="side-panel glassmorphism hidden">
+    <div class="side-panel-header">
+      <span>🖼️ Media Gallery</span>
+      <button id="gallery-panel-close" class="icon-btn-sm">✕</button>
+    </div>
+    <div id="gallery-grid" class="gallery-grid"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+     MENTION TOAST
+═══════════════════════════════════════════════════ -->
+  <div id="mention-toast" class="mention-toast hidden">
+    <span id="mention-toast-text"></span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════ -->
+  <div id="app-container" class="app-layout hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar glassmorphism" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <img src="logo.jpg" alt="Logo" class="brand-logo" />
+          <span class="brand-name">ChitChat</span>
+        </div>
+        <button id="sidebar-close-btn" class="icon-btn mobile-only" title="Close">✕</button>
+      </div>
+
+      <!-- CHANNELS -->
+      <div class="sidebar-section">
+        <div class="section-title">
+          <span>Channels</span>
+          <button id="open-create-channel-btn" class="icon-btn-xs" title="Create Channel">＋</button>
+        </div>
+        <nav class="channel-list" id="channel-list">
+          <button class="channel-btn active" data-room="general"><span class="channel-hash">#</span><span
+              class="channel-name">general</span><span class="unread-badge hidden" data-room="general">0</span></button>
+          <button class="channel-btn" data-room="lounge"><span class="channel-hash">#</span><span
+              class="channel-name">lounge</span><span class="unread-badge hidden" data-room="lounge">0</span></button>
+          <button class="channel-btn" data-room="tech-talk"><span class="channel-hash">#</span><span
+              class="channel-name">tech-talk</span><span class="unread-badge hidden"
+              data-room="tech-talk">0</span></button>
+          <button class="channel-btn" data-room="random"><span class="channel-hash">#</span><span
+              class="channel-name">random</span><span class="unread-badge hidden" data-room="random">0</span></button>
+          <button class="channel-btn" data-room="music-lounge"><span class="channel-hash">#</span><span
+              class="channel-name">music-lounge</span><span class="unread-badge hidden"
+              data-room="music-lounge">0</span></button>
+        </nav>
+      </div>
+
+      <!-- ONLINE MEMBERS -->
+      <div class="sidebar-section users-section">
+        <div class="section-title">
+          <span>Online Members</span>
+          <span class="online-badge" id="online-count">0</span>
+        </div>
+        <div class="users-list" id="users-list"></div>
+      </div>
+
+      <!-- USER PROFILE BAR -->
+      <div class="user-profile-bar">
+        <div class="profile-avatar" id="current-user-avatar">🚀</div>
+        <div class="profile-info">
+          <div class="profile-name" id="current-user-name">User</div>
+          <div class="profile-email" id="current-user-email">user@example.com</div>
+        </div>
+        <button id="edit-profile-btn" class="icon-btn-profile" title="Edit Profile">✏️</button>
+        <button id="logout-btn" class="logout-btn" title="Log Out">🚪</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT -->
+    <main class="chat-main">
+
+      <!-- HEADER -->
+      <header class="main-header glassmorphism">
+        <div class="header-left">
+          <button id="mobile-menu-btn" class="icon-btn mobile-only">☰</button>
+          <div class="room-details">
+            <h1 id="current-room-title"><span class="hash">#</span>general</h1>
+            <p id="current-room-desc" class="room-desc">Main community chat &amp; announcements</p>
+          </div>
+        </div>
+        <div class="header-controls">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Search messages..." />
+          </div>
+          <button id="pinned-btn" class="icon-btn" title="Pinned Messages">📌</button>
+          <button id="gallery-btn" class="icon-btn" title="Media Gallery">🖼️</button>
+          <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound"><span id="sound-icon">🔊</span></button>
+          <button id="notif-btn" class="icon-btn" title="Enable Notifications"><span id="notif-icon">🔔</span></button>
+          <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme"><span id="theme-icon">🌙</span></button>
+        </div>
+      </header>
+
+      <!-- MESSAGES -->
+      <div class="messages-container" id="messages-container">
+        <div class="channel-welcome-banner glassmorphism" id="welcome-banner">
+          <div class="welcome-icon">💬</div>
+          <h2>Welcome to <span id="banner-room-name">#general</span>!</h2>
+          <p>Start of <span id="banner-room-sub">#general</span> history. Say hello 👋</p>
+        </div>
+        <div id="messages-list" class="messages-list"></div>
+      </div>
+
+      <!-- TYPING INDICATOR -->
+      <div id="typing-indicator" class="typing-indicator hidden">
+        <span class="dots"><span>.</span><span>.</span><span>.</span></span>
+        <span id="typing-text">Someone is typing</span>
+      </div>
+
+      <!-- INPUT AREA -->
+      <footer class="input-area glassmorphism">
+
+        <!-- REPLY BANNER -->
+        <div id="reply-banner" class="reply-banner hidden">
+          <div class="reply-info">
+            <span class="reply-label">↩️ Replying to <strong id="reply-username">User</strong></span>
+            <span class="reply-snippet" id="reply-snippet"></span>
+          </div>
+          <button id="cancel-reply-btn" class="icon-btn-sm">✕</button>
+        </div>
+
+        <!-- EDIT BANNER -->
+        <div id="edit-banner" class="reply-banner hidden" style="border-left-color:#f59e0b">
+          <div class="reply-info">
+            <span class="reply-label" style="color:#f59e0b">✏️ Editing message</span>
+            <span class="reply-snippet" id="edit-snippet"></span>
+          </div>
+          <button id="cancel-edit-btn" class="icon-btn-sm">✕</button>
+        </div>
+
+        <!-- IMAGE PREVIEW -->
+        <div id="image-preview-bar" class="image-preview-bar hidden">
+          <img id="image-preview-thumb" src="" alt="" />
+          <button id="remove-image-btn" class="icon-btn-sm">✕</button>
+        </div>
+
+        <!-- EMOJI PICKER -->
+        <div id="emoji-picker" class="emoji-picker glassmorphism hidden">
+          <div class="emoji-picker-tabs">
+            <button class="epick-tab active" data-tab="quick">Quick</button>
+            <button class="epick-tab" data-tab="all">All</button>
+          </div>
+          <div class="emoji-grid" id="emoji-quick-grid">
+            <span>😀</span><span>😂</span><span>😍</span><span>🔥</span><span>🚀</span>
+            <span>❤️</span><span>👍</span><span>🎉</span><span>😎</span><span>🙌</span>
+            <span>💡</span><span>✨</span><span>🥳</span><span>💯</span><span>👏</span>
+            <span>🙏</span><span>💩</span><span>🤩</span><span>💪</span><span>🎯</span>
+            <span>🌈</span><span>⭐</span><span>🎵</span><span>🤔</span><span>😅</span>
+            <span>😭</span><span>🥰</span><span>🤝</span><span>🎊</span><span>🦾</span>
+          </div>
+        </div>
+
+        <!-- GIF PICKER -->
+        <div id="gif-picker" class="gif-picker glassmorphism hidden">
+          <div class="gif-search-row">
+            <input type="text" id="gif-search-input" placeholder="Search GIFs..." />
+            <button type="button" id="gif-search-btn" class="btn-primary-gradient"
+              style="padding:6px 12px;font-size:.8rem">Search</button>
+          </div>
+          <div id="gif-grid" class="gif-grid">
+            <p style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:20px">Type to search GIFs 🎬
+            </p>
+          </div>
+        </div>
+
+        <form id="chat-form" class="chat-form">
+          <label class="icon-btn attachment-btn" title="Attach Image">
+            <span>📷</span>
+            <input type="file" id="image-input" accept="image/*" class="hidden-input" />
+          </label>
+          <button type="button" id="gif-btn" class="icon-btn" title="GIFs">🎬</button>
+          <button type="button" id="emoji-btn" class="icon-btn" title="Emoji">😀</button>
+          <button type="button" id="poll-btn" class="icon-btn" title="Create Poll">🗳️</button>
+          <input type="text" id="chat-input" placeholder="Message #general... (use @username to mention)"
+            autocomplete="off" />
+          <button type="submit" class="btn-send-gradient" id="send-btn">
+            <span>Send</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+
+        <!-- MENTION AUTOCOMPLETE -->
+        <div id="mention-autocomplete" class="mention-autocomplete hidden"></div>
+
+      </footer>
+    </main>
+  </div>
+
+  <!-- Socket.IO D Client (Local server with CDN fallback for Netlify) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (typeof io === 'undefined') {
+      document.write('<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"><\/script>');
+    }
+  </script>
+  <script src="app.js"></script>
 </body>
+
 </html>
