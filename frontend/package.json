@@ -1,0 +1,17 @@
+{
+  "name": "chit-chat-frontend",
+  "version": "1.0.0",
+  "description": "ChitChat - Modern Realtime Workspace (Frontend)",
+  "scripts": {
+    "start": "npx -y serve . -l 5000",
+    "dev": "npx -y serve . -l 5000"
+  },
+  "keywords": [
+    "chat",
+    "realtime",
+    "frontend",
+    "workspace"
+  ],
+  "author": "",
+  "license": "ISC"
+}
