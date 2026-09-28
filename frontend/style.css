@@ -1022,23 +1022,34 @@ body::after {
 /* ACTIONS ON HOVER */
 .msg-actions {
   position: absolute;
-  top: -16px;
-  right: 10px;
+  top: -18px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 2px 6px;
+  padding: 3px 6px;
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 3px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  z-index: 30;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
+/* For messages sent by self (right-aligned) -> anchor to right edge of bubble */
 .message-item.self .msg-actions {
+  right: 0;
+  left: auto;
+}
+
+/* For messages sent by others (left-aligned) -> anchor to left edge of bubble */
+.message-item.other .msg-actions {
+  left: 0;
   right: auto;
-  left: 10px;
 }
 
 .message-item:hover .msg-actions {
@@ -2102,15 +2113,26 @@ body {
   }
 
   .msg-actions {
-    top: -14px;
+    top: -16px;
     padding: 2px 4px;
     gap: 2px;
   }
 
+  .message-item.self .msg-actions {
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  .message-item.other .msg-actions {
+    left: 0 !important;
+    right: auto !important;
+  }
+
   .action-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 0.85rem;
+    width: 26px;
+    height: 26px;
+    font-size: 0.82rem;
+    padding: 2px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2389,6 +2411,19 @@ body {
     padding: 8px 12px;
     font-size: 0.88rem;
     border-radius: 14px;
+  }
+
+  .msg-actions {
+    top: -14px;
+    padding: 1px 3px;
+    gap: 1px;
+  }
+
+  .action-btn {
+    width: 23px;
+    height: 23px;
+    font-size: 0.75rem;
+    padding: 1px;
   }
 
   /* Modals on small mobile */

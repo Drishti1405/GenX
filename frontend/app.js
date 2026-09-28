@@ -440,9 +440,17 @@ function renderHistory(history) {
   scrollToBottom();
 }
 
+function isUserSelf(sender) {
+  if (!sender) return false;
+  if (currentUser.username && sender.username && sender.username.toLowerCase() === currentUser.username.toLowerCase()) return true;
+  if (currentUser.id && sender.id && (String(sender.id) === String(currentUser.id) || String(sender._id) === String(currentUser.id))) return true;
+  if (socket.id && sender.id === socket.id) return true;
+  return false;
+}
+
 socket.on('chat message', msg => {
   appendMessage(msg, true);
-  const isSelf = msg.sender.username === currentUser.username;
+  const isSelf = isUserSelf(msg.sender);
   playSound(isSelf ? 'send' : 'receive');
   if (!isSelf && document.hidden) { incrementUnread(msg.room); }
   scrollToBottom();
@@ -460,7 +468,7 @@ function appendSystemMsg(m) {
 }
 
 function appendMessage(msg, animate) {
-  const isSelf = msg.sender.username === currentUser.username || msg.sender.id === socket.id;
+  const isSelf = isUserSelf(msg.sender);
 
   // Collect media
   if (msg.image && msg.room === currentRoom) {
