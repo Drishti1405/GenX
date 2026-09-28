@@ -52,12 +52,19 @@
   padding: 0;
 }
 
-html {
+html,
+body {
   width: 100%;
+  height: 100%;
+  height: 100vh;
+  height: 100dvh;
   max-width: 100%;
+  max-height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -65,15 +72,7 @@ body {
   font-family: var(--font-body);
   background: var(--bg-body);
   color: var(--text-main);
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  height: 100dvh;
-  overflow-x: hidden;
   position: relative;
-  box-sizing: border-box;
 }
 
 /* Background Animated Gradient Blobs */
@@ -424,23 +423,35 @@ body::after {
 /* --- APP LAYOUT --- */
 .app-layout {
   display: flex;
+  height: 100%;
   height: 100vh;
   height: 100dvh;
+  max-height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
 }
 
 /* SIDEBAR */
 .sidebar {
   width: 280px;
+  height: 100%;
+  max-height: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--border-color);
   z-index: 100;
+  overflow: hidden;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .sidebar-header {
@@ -449,6 +460,7 @@ body::after {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .brand {
@@ -537,8 +549,10 @@ body::after {
 }
 
 .users-section {
-  flex-grow: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .users-list {
@@ -632,6 +646,7 @@ body::after {
   gap: 12px;
   border-top: 1px solid var(--border-color);
   background: rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .profile-avatar {
@@ -691,17 +706,23 @@ body::after {
 
 /* CHAT MAIN AREA */
 .chat-main {
-  flex-grow: 1;
+  flex: 1 1 0%;
   display: flex;
   flex-direction: column;
+  height: 100%;
   height: 100vh;
   height: 100dvh;
+  max-height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
   width: 100%;
   min-width: 0;
+  min-height: 0;
   max-width: 100%;
   position: relative;
   background: transparent;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* HEADER */
@@ -712,6 +733,11 @@ body::after {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .header-left {
@@ -803,12 +829,19 @@ body::after {
 
 /* MESSAGES CONTAINER */
 .messages-container {
-  flex-grow: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 .channel-welcome-banner {
@@ -816,6 +849,10 @@ body::after {
   border-radius: 20px;
   margin-bottom: 12px;
   text-align: left;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .welcome-icon {
@@ -838,6 +875,10 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .message-item {
@@ -845,6 +886,8 @@ body::after {
   gap: 14px;
   max-width: 80%;
   position: relative;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .message-item.animate-in {
@@ -893,6 +936,9 @@ body::after {
   display: flex;
   flex-direction: column;
   position: relative;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .msg-header {
@@ -923,8 +969,11 @@ body::after {
   font-size: 0.95rem;
   line-height: 1.45;
   word-break: break-word;
+  overflow-wrap: anywhere;
   position: relative;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .message-item.self .msg-bubble {
@@ -960,12 +1009,14 @@ body::after {
 }
 
 .msg-image {
-  max-width: 260px;
+  max-width: 100%;
+  width: auto;
   max-height: 200px;
   border-radius: 12px;
   margin-top: 8px;
   cursor: pointer;
   object-fit: cover;
+  box-sizing: border-box;
 }
 
 /* ACTIONS ON HOVER */
@@ -1059,6 +1110,9 @@ body::after {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .dots span {
@@ -1078,6 +1132,11 @@ body::after {
   padding: 16px 24px;
   border-top: 1px solid var(--border-color);
   position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .reply-banner, .image-preview-bar {
@@ -1089,11 +1148,26 @@ body::after {
   border-radius: 10px;
   margin-bottom: 10px;
   font-size: 0.85rem;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.reply-info {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  flex: 1;
 }
 
 .reply-snippet {
   color: var(--text-muted);
   margin-left: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .image-preview-bar img {
@@ -1139,6 +1213,10 @@ body::after {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .hidden-input {
@@ -1150,7 +1228,8 @@ body::after {
 }
 
 .chat-form input[type="text"] {
-  flex-grow: 1;
+  flex: 1 1 0%;
+  min-width: 0;
   padding: 14px 18px;
   border-radius: 16px;
   background: var(--bg-input);
@@ -1159,6 +1238,7 @@ body::after {
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .chat-form input[type="text"]:focus {
@@ -1671,12 +1751,12 @@ body::after {
 html,
 body {
   width: 100%;
+  height: 100%;
   max-width: 100%;
+  max-height: 100%;
   margin: 0;
   padding: 0;
-  height: 100vh;
-  height: 100dvh;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -1684,28 +1764,47 @@ body {
 #app-container {
   width: 100%;
   max-width: 100%;
+  height: 100%;
   height: 100vh;
   height: 100dvh;
+  max-height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
+  display: flex;
 }
 
 .chat-main {
+  flex: 1 1 0%;
   width: 100%;
   min-width: 0;
+  min-height: 0;
   max-width: 100%;
+  height: 100%;
   height: 100vh;
   height: 100dvh;
+  max-height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .messages-container {
+  flex: 1 1 0%;
   min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .msg-bubble {
@@ -1772,10 +1871,12 @@ body {
   html,
   body {
     width: 100% !important;
+    height: 100% !important;
     max-width: 100% !important;
+    max-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow-x: hidden !important;
+    overflow: hidden !important;
   }
 
   body::before {
@@ -1796,25 +1897,42 @@ body {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 100% !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100% !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
     margin: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
     transform: none !important;
-    overflow-x: hidden !important;
+    overflow: hidden !important;
+    display: flex !important;
   }
 
   .chat-main {
     width: 100% !important;
     min-width: 0 !important;
+    min-height: 0 !important;
     max-width: 100% !important;
+    height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100% !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
     flex: 1 1 100% !important;
     margin: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .main-header,
@@ -2127,7 +2245,16 @@ body {
 ───────────────────────────────────────── */
 @media (max-width: 480px) {
   html,
-  body,
+  body {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
   .app-layout,
   #app-container,
   .chat-main,
