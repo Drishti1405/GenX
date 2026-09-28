@@ -6,7 +6,9 @@ const BACKEND_URL = (typeof window.__CHITCHAT_BACKEND_URL__ !== 'undefined' && w
   ? window.__CHITCHAT_BACKEND_URL__
   : (localStorage.getItem('chitchat_backend_url') || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '3000' ? 'http://localhost:3000' : ''));
 
-const socket = io(BACKEND_URL || window.location.origin);
+const socket = (typeof io !== 'undefined')
+  ? io(BACKEND_URL || window.location.origin, { transports: ['websocket', 'polling'] })
+  : { on: () => {}, emit: () => {}, disconnect: () => {}, connect: () => {} };
 
 function api(endpoint) {
   const base = BACKEND_URL ? BACKEND_URL.replace(/\/$/, '') : '';
