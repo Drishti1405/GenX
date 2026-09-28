@@ -59,26 +59,30 @@ async function connectDB() {
     isMongoConnected = true;
     return true;
   }
-  if (!MONGO_URI) {
+  if (!MONGO_URI || MONGO_URI.includes('127.0.0.1')) {
+    console.warn('[MongoDB] No Atlas URI found, using memory fallback.');
     isMongoConnected = false;
     return false;
   }
   try {
     await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 3000
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+      socketTimeoutMS: 30000,
+      retryWrites: true
     });
     isMongoConnected = (mongoose.connection.readyState === 1);
-    if (isMongoConnected) console.log(`[MongoDB] Connected to database`);
+    if (isMongoConnected) console.log(`[MongoDB] ✅ Connected to Atlas!`);
     return isMongoConnected;
   } catch (err) {
-    console.warn(`[MongoDB] Connection error: ${err.message}. Using memory fallback.`);
+    console.error(`[MongoDB] ❌ Connection failed: ${err.message}`);
     isMongoConnected = false;
     return false;
   }
 }
 
-// Initial trigger
-connectDB().catch(() => {});
+// Initial connection on startup
+connectDB().catch(err => console.error('[MongoDB] Startup connect error:', err.message));
 
 // Middleware to ensure DB connection is checked for API calls
 app.use(async (req, res, next) => {
