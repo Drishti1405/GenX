@@ -41,7 +41,18 @@ const roomDescriptions = {
 const $ = id => document.getElementById(id);
 
 // Auth
+const appLoader        = $('app-loader');
 const loginModal       = $('login-modal');
+
+let appLoaderDismissed = false;
+function hideAppLoader() {
+  if (appLoaderDismissed || !appLoader) return;
+  appLoaderDismissed = true;
+  appLoader.classList.add('fade-out');
+  setTimeout(() => {
+    appLoader.classList.add('hidden');
+  }, 300);
+}
 const tabLoginBtn      = $('tab-login-btn');
 const tabRegisterBtn   = $('tab-register-btn');
 const authErrorBox     = $('auth-error-box');
@@ -207,16 +218,48 @@ loginForm.addEventListener('submit', async e => {
 
 // Auto-login
 async function checkSession() {
-  if (!authToken) return;
+  const minDelay = new Promise(resolve => setTimeout(resolve, 350));
+  const safetyTimeout = setTimeout(() => {
+    hideAppLoader();
+    if (!currentUser.id) {
+      loginModal.classList.remove('hidden');
+    }
+  }, 3500);
+
+  if (!authToken) {
+    await minDelay;
+    clearTimeout(safetyTimeout);
+    hideAppLoader();
+    loginModal.classList.remove('hidden');
+    return;
+  }
+
   try {
-    const res = await fetch(api('/api/auth/me'), { headers: { Authorization: `Bearer ${authToken}` } });
-    if (res.ok) { const d = await res.json(); currentUser = d.user; initSession(); }
-    else { localStorage.removeItem('chitchat_token'); authToken = null; }
-  } catch {}
+    const [res] = await Promise.all([
+      fetch(api('/api/auth/me'), { headers: { Authorization: `Bearer ${authToken}` } }),
+      minDelay
+    ]);
+    clearTimeout(safetyTimeout);
+    if (res.ok) {
+      const d = await res.json();
+      currentUser = d.user;
+      initSession();
+    } else {
+      localStorage.removeItem('chitchat_token');
+      authToken = null;
+      hideAppLoader();
+      loginModal.classList.remove('hidden');
+    }
+  } catch {
+    clearTimeout(safetyTimeout);
+    hideAppLoader();
+    loginModal.classList.remove('hidden');
+  }
 }
 checkSession();
 
 function initSession() {
+  hideAppLoader();
   loginModal.classList.add('hidden');
   appContainer.classList.remove('hidden');
   currentUserName.textContent = currentUser.username;

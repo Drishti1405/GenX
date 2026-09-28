@@ -21,7 +21,23 @@
   <!-- ═══════════════════════════════════════════════════
      AUTH MODAL
 ═══════════════════════════════════════════════════ -->
-  <div id="login-modal" class="modal-overlay">
+  <!-- ═══════════════════════════════════════════════════
+     APP LOADER / CONNECTING SCREEN
+  ═══════════════════════════════════════════════════ -->
+  <div id="app-loader" class="app-loader-overlay">
+    <div class="app-loader-card glassmorphism">
+      <img src="logo.jpg" alt="ChitChat Logo" class="app-loader-logo" />
+      <h1 class="app-loader-brand">ChitChat</h1>
+      <p class="app-loader-status">Connecting...</p>
+      <div class="app-loader-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <div id="login-modal" class="modal-overlay hidden">
     <div class="modal-card glassmorphism">
       <div class="modal-header">
         <img src="logo.jpg" alt="ChitChat Logo" class="brand-logo-large" />
