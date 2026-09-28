@@ -337,6 +337,22 @@ function switchRoom(room, btn) {
   if (!mediaGallery[room]) mediaGallery[room] = [];
 }
 
+socket.on('connect', () => {
+  console.log('[Socket] Connected, ID:', socket.id);
+  if (currentUser && currentUser.username) {
+    socket.emit('login', currentUser);
+    if (currentRoom && currentRoom !== 'general') {
+      socket.emit('switch room', currentRoom);
+    }
+  }
+});
+
+socket.on('need login', () => {
+  if (currentUser && currentUser.username) {
+    socket.emit('login', currentUser);
+  }
+});
+
 socket.on('login success', d => {
   renderHistory(d.history);
   renderUsers(d.roomUsers);
@@ -667,7 +683,7 @@ chatForm.addEventListener('submit', e => {
     socket.emit('edit message', { messageId: editingMsgId, newText: text });
     editingMsgId = null; editBanner.classList.add('hidden');
   } else {
-    socket.emit('chat message', { text, image: pendingImage, replyTo });
+    socket.emit('chat message', { text, image: pendingImage, replyTo, sender: currentUser, room: currentRoom });
   }
   chatInput.value = ''; pendingImage = null; imageInput.value = '';
   imagePreviewBar.classList.add('hidden');

@@ -319,8 +319,26 @@ io.on('connection', (socket) => {
 
   // ── Chat Message ────────────────────────────────────────────────────────
   socket.on('chat message', async (msgData) => {
-    const user = activeUsers.get(socket.id);
-    if (!user) return;
+    let user = activeUsers.get(socket.id);
+    if (!user && msgData && msgData.sender && msgData.sender.username) {
+      user = {
+        id: socket.id,
+        userId: msgData.sender.id || null,
+        username: msgData.sender.username,
+        email: msgData.sender.email || '',
+        avatar: msgData.sender.avatar || '🚀',
+        status: msgData.sender.status || 'online',
+        room: msgData.room || DEFAULT_ROOM,
+        lastSeen: null
+      };
+      activeUsers.set(socket.id, user);
+      socket.join(user.room);
+      io.to(user.room).emit('room users update', getRoomUsers(user.room));
+    }
+    if (!user) {
+      socket.emit('need login');
+      return;
+    }
 
     // Parse @mentions
     const mentionedUsers = [...(msgData.text || '').matchAll(/@(\w+)/g)].map(m => m[1]);
@@ -517,8 +535,12 @@ async function getRoomHistory(room) {
 
 function getRoomUsers(room) {
   const list = [];
+  const seen = new Set();
   for (const [, u] of activeUsers.entries()) {
-    if (u.room === room) list.push({ id: u.id, username: u.username, avatar: u.avatar, status: u.status });
+    if (u.room === room && !seen.has(u.username)) {
+      seen.add(u.username);
+      list.push({ id: u.id, username: u.username, avatar: u.avatar, status: u.status });
+    }
   }
   return list;
 }
