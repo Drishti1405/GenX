@@ -6,7 +6,9 @@ const BACKEND_URL = (typeof window.__CHITCHAT_BACKEND_URL__ !== 'undefined' && w
   ? window.__CHITCHAT_BACKEND_URL__
   : (localStorage.getItem('chitchat_backend_url') || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '3000' ? 'http://localhost:3000' : ''));
 
-const socket = io(BACKEND_URL || window.location.origin);
+const socket = (typeof io !== 'undefined')
+  ? io(BACKEND_URL || window.location.origin, { transports: ['websocket', 'polling'] })
+  : { on: () => {}, emit: () => {}, disconnect: () => {}, connect: () => {} };
 
 function api(endpoint) {
   const base = BACKEND_URL ? BACKEND_URL.replace(/\/$/, '') : '';
@@ -334,6 +336,22 @@ function switchRoom(room, btn) {
   sidebar.classList.remove('open');
   if (!mediaGallery[room]) mediaGallery[room] = [];
 }
+
+socket.on('connect', () => {
+  console.log('[Socket] Connected, ID:', socket.id);
+  if (currentUser && currentUser.username) {
+    socket.emit('login', currentUser);
+    if (currentRoom && currentRoom !== 'general') {
+      socket.emit('switch room', currentRoom);
+    }
+  }
+});
+
+socket.on('need login', () => {
+  if (currentUser && currentUser.username) {
+    socket.emit('login', currentUser);
+  }
+});
 
 socket.on('login success', d => {
   renderHistory(d.history);
@@ -665,7 +683,7 @@ chatForm.addEventListener('submit', e => {
     socket.emit('edit message', { messageId: editingMsgId, newText: text });
     editingMsgId = null; editBanner.classList.add('hidden');
   } else {
-    socket.emit('chat message', { text, image: pendingImage, replyTo });
+    socket.emit('chat message', { text, image: pendingImage, replyTo, sender: currentUser, room: currentRoom });
   }
   chatInput.value = ''; pendingImage = null; imageInput.value = '';
   imagePreviewBar.classList.add('hidden');
@@ -820,13 +838,31 @@ soundToggleBtn.addEventListener('click', () => {
 $('mobile-menu-btn').addEventListener('click', () => sidebar.classList.add('open'));
 $('sidebar-close-btn').addEventListener('click', () => sidebar.classList.remove('open'));
 
-// ── Close popovers on outside click ──────────────────
+// ── Close popovers & mobile sidebar on outside click ──────────────────
 document.addEventListener('click', e => {
   if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) emojiPicker.classList.add('hidden');
   if (!gifPicker.contains(e.target) && e.target !== gifBtn) gifPicker.classList.add('hidden');
   if (!mentionAutocomplete.contains(e.target) && e.target !== chatInput) mentionAutocomplete.classList.add('hidden');
   if (!pinnedPanel.contains(e.target) && e.target !== pinnedBtn) pinnedPanel.classList.add('hidden');
   if (!galleryPanel.contains(e.target) && e.target !== galleryBtn) galleryPanel.classList.add('hidden');
+
+  // Close mobile sidebar on outside tap
+  if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+    if (!sidebar.contains(e.target) && !$('mobile-menu-btn').contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+
+// Toggle message action buttons on mobile touch
+messagesList.addEventListener('click', e => {
+  if (window.innerWidth > 768) return;
+  const item = e.target.closest('.message-item');
+  if (item && !e.target.closest('.action-btn')) {
+    const wasOpen = item.classList.contains('show-actions');
+    document.querySelectorAll('.message-item.show-actions').forEach(el => el.classList.remove('show-actions'));
+    if (!wasOpen) item.classList.add('show-actions');
+  }
 });
 
 // ── Utils ─────────────────────────────────────────────

@@ -838,13 +838,31 @@ soundToggleBtn.addEventListener('click', () => {
 $('mobile-menu-btn').addEventListener('click', () => sidebar.classList.add('open'));
 $('sidebar-close-btn').addEventListener('click', () => sidebar.classList.remove('open'));
 
-// ── Close popovers on outside click ──────────────────
+// ── Close popovers & mobile sidebar on outside click ──────────────────
 document.addEventListener('click', e => {
   if (!emojiPicker.contains(e.target) && e.target !== emojiBtn) emojiPicker.classList.add('hidden');
   if (!gifPicker.contains(e.target) && e.target !== gifBtn) gifPicker.classList.add('hidden');
   if (!mentionAutocomplete.contains(e.target) && e.target !== chatInput) mentionAutocomplete.classList.add('hidden');
   if (!pinnedPanel.contains(e.target) && e.target !== pinnedBtn) pinnedPanel.classList.add('hidden');
   if (!galleryPanel.contains(e.target) && e.target !== galleryBtn) galleryPanel.classList.add('hidden');
+
+  // Close mobile sidebar on outside tap
+  if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+    if (!sidebar.contains(e.target) && !$('mobile-menu-btn').contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+
+// Toggle message action buttons on mobile touch
+messagesList.addEventListener('click', e => {
+  if (window.innerWidth > 768) return;
+  const item = e.target.closest('.message-item');
+  if (item && !e.target.closest('.action-btn')) {
+    const wasOpen = item.classList.contains('show-actions');
+    document.querySelectorAll('.message-item.show-actions').forEach(el => el.classList.remove('show-actions'));
+    if (!wasOpen) item.classList.add('show-actions');
+  }
 });
 
 // ── Utils ─────────────────────────────────────────────
